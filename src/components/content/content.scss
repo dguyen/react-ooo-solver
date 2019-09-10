@@ -1,0 +1,25 @@
+#contentContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40%;
+
+  #contentCard {
+    width: 80%;
+    height: 80%;
+    background-color: white;
+    border-radius: 12px;
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+
+    #inputListContainer {
+      float: left;
+      width: 300px;
+    }
+
+    #rightSideContent {
+      float: right;
+    }
+  }
+}

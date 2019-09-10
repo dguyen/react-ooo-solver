@@ -14,9 +14,12 @@
     color: white;
     margin-right: 1em;
 
-    a {
+    a, a:visited, a:active, a:focus {
       text-decoration: none;
-    }
+      color: white;
+      border: 0;
+      outline: none;
+    } 
   }
   
   #githubText > a:visited, #githubText > a:active, #githubText > a:focus {
