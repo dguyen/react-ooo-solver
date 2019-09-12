@@ -10,7 +10,8 @@ class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      userInputs: []
+      userInputs: [],
+      selectedItem: null
     }
   }
 
@@ -23,10 +24,24 @@ class App extends React.Component {
       return;
     }
     this.setState((prev) => {
-      return {
-        userInputs: prev.userInputs.concat([itemName])
+      let newUpdate = {
+        userInputs: prev.userInputs.concat([itemName])        
       }
+      if (this.state.userInputs.length <= 0) {
+        newUpdate['selectedItem'] = itemName;
+      }
+      return newUpdate;
     });
+  }
+
+  /**
+   * Select an item
+   * @param {string} item - a string representing an item 
+   */
+  selectItem = (item) => {
+    this.setState({
+      selectedItem: item ? item : this.state.inputs[0]
+    })
   }
 
   /**
@@ -39,9 +54,13 @@ class App extends React.Component {
     }
 
     this.setState((prev) => {
-      return {
+      let newInput = {
         userInputs: prev.userInputs.slice(0, itemIndex).concat((prev.userInputs.slice(itemIndex + 1)))
       }
+      if (prev.userInputs[itemIndex] === prev.selectedItem && newInput['userInputs'].length >= 1) {
+        newInput['selectedItem'] = newInput['userInputs'][0];
+      }
+      return newInput;
     });
   }
 
@@ -52,7 +71,13 @@ class App extends React.Component {
   render() {
     let showContent = null;
     if (this.state.userInputs.length > 0) {
-      showContent = (<Content inputs={this.state.userInputs} removeHandler={this.removeItem}/>);
+      showContent = (
+        <Content 
+          inputs={this.state.userInputs}
+          selectedItem={this.state.selectedItem}
+          selectItem={this.selectItem}
+          removeHandler={this.removeItem}/>
+      );
     }
 
     return (

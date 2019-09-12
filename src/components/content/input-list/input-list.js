@@ -26,7 +26,8 @@ class InputList extends React.Component {
           className={this.props.selectedItem === anInput ? 'selectedItem' : null}
           key={i}
         >
-          {anInput}
+          <div id="indicator"></div>
+          <span>{anInput}</span>
           <svg
             id="deleteIcon"
             onClick={(e) => this.removeItem(i, e)}
