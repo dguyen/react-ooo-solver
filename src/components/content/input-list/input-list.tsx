@@ -1,18 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './input-list.scss';
 
-class InputList extends React.Component {
-  constructor() {
-    super();
-  }
+interface Props {
+  removeHandler: Function,
+  selectItem: Function,
+  inputs: Array<string>,
+  selectedItem: string | null,
+}
 
+export default class InputList extends React.Component<Props> {
   /**
    * Remove an item from the list
    * @param {number} i - the index of the item
    * @param {event} e - the event
    */
-  removeItem = (i, e) => {
+  removeItem = (i: number, e: React.MouseEvent) => {
     e.stopPropagation(); // Stops selectItem from firing after deletion
     this.props.removeHandler(i);
   }
@@ -23,7 +25,7 @@ class InputList extends React.Component {
         <div
           id="item"
           onClick={() => this.props.selectItem(anInput)}
-          className={this.props.selectedItem === anInput ? 'selectedItem' : null}
+          className={this.props.selectedItem === anInput ? 'selectedItem' : undefined}
           key={i}
         >
           <div id="indicator"></div>
@@ -48,12 +50,3 @@ class InputList extends React.Component {
     )
   }
 }
-
-InputList.propTypes = {
-  inputs: PropTypes.array,
-  selectedItem: PropTypes.string,
-  selectItem: PropTypes.func,
-  removeHandler: PropTypes.func
-}
-
-export default InputList;

@@ -5,10 +5,15 @@ import Header from '../components/header/header';
 import Content from '../components/content/content';
 import Footer from '../components/footer/footer';
 
-class App extends React.Component {
+interface MyState {
+  userInputs: Array<string>,
+  selectedItem: string | null
+}
 
-  constructor() {
-    super();
+export default class App extends React.Component<undefined, MyState> {
+
+  constructor(props: any) {
+    super(props);
     this.state = {
       userInputs: [],
       selectedItem: null
@@ -19,16 +24,14 @@ class App extends React.Component {
    * Add an item to user inputs
    * @param {string} itemName - the name of the item to be added  
    */
-  addItem = (itemName) => {
+  addItem = (itemName: string) => {
     if (this.state.userInputs.includes(itemName)) {
       return;
     }
     this.setState((prev) => {
       let newUpdate = {
-        userInputs: prev.userInputs.concat([itemName])        
-      }
-      if (this.state.userInputs.length <= 0) {
-        newUpdate['selectedItem'] = itemName;
+        userInputs: prev.userInputs.concat([itemName]),
+        selectedItem: prev.userInputs.length <= 0 ? itemName : prev.selectedItem
       }
       return newUpdate;
     });
@@ -38,9 +41,9 @@ class App extends React.Component {
    * Select an item
    * @param {string} item - a string representing an item 
    */
-  selectItem = (item) => {
+  selectItem = (item: string) => {
     this.setState({
-      selectedItem: item ? item : this.state.inputs[0]
+      selectedItem: item ? item : this.state.userInputs[0]
     })
   }
 
@@ -48,17 +51,18 @@ class App extends React.Component {
    * Remove an item from the user inputs
    * @param {number} itemIndex - the index of the item to be removed  
    */
-  removeItem = (itemIndex) => {
+  removeItem = (itemIndex: number) => {
     if (this.state.userInputs.length < itemIndex) {
       return;
     }
 
-    this.setState((prev) => {
+    this.setState((prev) => {            
       let newInput = {
-        userInputs: prev.userInputs.slice(0, itemIndex).concat((prev.userInputs.slice(itemIndex + 1)))
+        userInputs: prev.userInputs.slice(0, itemIndex).concat((prev.userInputs.slice(itemIndex + 1))),
+        selectedItem: prev.selectedItem
       }
-      if (prev.userInputs[itemIndex] === prev.selectedItem && newInput['userInputs'].length >= 1) {
-        newInput['selectedItem'] = newInput['userInputs'][0];
+      if (prev.userInputs[itemIndex] === prev.selectedItem && newInput.userInputs.length >= 1) {
+        newInput.selectedItem = newInput.userInputs[0]
       }
       return newInput;
     });
@@ -89,5 +93,3 @@ class App extends React.Component {
     )
   }
 }
-
-export default App;

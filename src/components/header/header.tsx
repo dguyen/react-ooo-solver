@@ -1,9 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import UserInput from '../user-input/user-input';
 import './header.scss';
 
-const Header = (props) => (
+interface Props {
+  addInput: Function,
+  solve: Function,
+}
+
+const Header = (props: Props) => (
   <div id="container">
     <div id="titleContainer">
       <h1>Odd One Out Solver</h1>
@@ -13,10 +17,5 @@ const Header = (props) => (
     <UserInput addInput={props.addInput} solve={props.solve}/>
   </div>
 )
-
-Header.propTypes = {
-  addInput: PropTypes.func,
-  solve: PropTypes.func
-};
 
 export default Header;

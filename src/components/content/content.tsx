@@ -1,9 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import InputList from './input-list/input-list';
 import './content.scss';
 
-class Content extends React.Component {
+interface Props {
+  inputs: Array<string>,
+  removeHandler: Function,
+  selectItem: Function,
+  selectedItem: string | null,
+}
+
+export default class Content extends React.Component<Props> {
   render() {
     return (
       <div id="contentContainer">
@@ -22,12 +28,3 @@ class Content extends React.Component {
     )
   }
 }
-
-Content.propTypes = {
-  inputs: PropTypes.array,
-  selectedItem: PropTypes.string,
-  selectItem: PropTypes.func,
-  removeHandler: PropTypes.func,
-}
-
-export default Content;

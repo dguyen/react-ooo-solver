@@ -1,14 +1,19 @@
 import React from 'react';
 import './user-input.scss';
 
-class UserInput extends React.Component {
+interface Props {
+  solve: Function,
+  addInput: Function,
+}
+
+class UserInput extends React.Component<Props> {
   /**
    * Adds a new input
    */
   addNewInput() {
-    let newInputRef = document.getElementById('userInputField');
+    let newInputRef = (document.getElementById('userInputField') as HTMLInputElement);
     
-    if (this.validateInput(newInputRef.value)) {
+    if (newInputRef && this.validateInput(newInputRef.value)) {
       this.props.addInput(newInputRef.value);
       newInputRef.value = '';
     }
@@ -18,7 +23,7 @@ class UserInput extends React.Component {
    * Validates an input
    * @param {string} newInput - an input to be validated 
    */
-  validateInput(newInput) {
+  validateInput(newInput: string) {
     if (newInput.length <= 0) {
       return false;
     }
@@ -28,7 +33,7 @@ class UserInput extends React.Component {
   /**
    * Handles key enter down on input
    */
-  handleKeyDown = (e) => {
+  handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       this.addNewInput();
     }
@@ -42,7 +47,7 @@ class UserInput extends React.Component {
           <button className="noselect" onClick={this.addNewInput}>Enter</button>
         </div>
 
-        <button id="submitButton" onClick={this.props.solve}>Solve</button>
+        <button id="submitButton" onClick={() => this.props.solve()}>Solve</button>
       </div>
     )
   }
