@@ -1,4 +1,5 @@
 import React from 'react';
+import WikipediaAPI, { WikiItem } from '../api/WikipediaAPI';
 
 // Components
 import Header from '../components/header/header';
@@ -7,17 +8,15 @@ import Footer from '../components/footer/footer';
 
 interface MyState {
   userInputs: Array<string>,
-  selectedItem: string | null
+  selectedItem: string | null,
+  wikiItems: {[id: string]: WikiItem}
 }
 
 export default class App extends React.Component<undefined, MyState> {
-
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      userInputs: [],
-      selectedItem: null
-    }
+  state = {
+    userInputs: [] as Array<string>,
+    selectedItem: null,
+    wikiItems: {} as {[id: string]: WikiItem}
   }
 
   /**
@@ -25,9 +24,7 @@ export default class App extends React.Component<undefined, MyState> {
    * @param {string} itemName - the name of the item to be added  
    */
   addItem = (itemName: string) => {
-    if (this.state.userInputs.includes(itemName)) {
-      return;
-    }
+    if (this.state.userInputs.includes(itemName)) { return }
     this.setState((prev) => {
       let newUpdate = {
         userInputs: prev.userInputs.concat([itemName]),
@@ -35,6 +32,31 @@ export default class App extends React.Component<undefined, MyState> {
       }
       return newUpdate;
     });
+
+    // If item has never been inputted before
+    if (!this.state.wikiItems.hasOwnProperty(itemName)) {
+      this.setItemCategories(itemName);
+    }
+  }
+
+  /**
+   * Find the categories of an item and set it into WikiItems
+   * @param itemName the name of the item to set categories
+   */
+  setItemCategories = (itemName: string) => {
+    WikipediaAPI.getCategories(itemName).then((data) => {
+      if (data.isAmbiguous) {
+        // Todo: Get potiential links
+      }
+      this.setState((prev) => {
+        let newWikiItems = Object.assign(prev.wikiItems);
+        newWikiItems[itemName] = data;
+        return { wikiItems: newWikiItems }
+      })
+    }).catch((err) => {
+      // Todo: Handle missing page error
+      console.log(err);
+    })
   }
 
   /**
