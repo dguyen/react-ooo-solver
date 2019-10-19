@@ -1,22 +1,14 @@
-const CATEGORY_ENDPOINT = "https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=categories&redirects&cllimit=max&clshow=!hidden&titles="
-const LINKS_ENDPOINT = "https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=links&pllimit=max&titles="
+const CATEGORY_ENDPOINT = 'https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=categories|extracts&exintro&explaintext&redirects&cllimit=max&clshow=!hidden&titles='
+const LINKS_ENDPOINT = 'https://en.wikipedia.org/w/api.php?action=query&origin=*&redirects&format=json&prop=links&pllimit=max&titles='
 
 export interface WikiItem {
+  exists: boolean;
   categories: Array<string>;
   isAmbiguous: boolean;
+  links: Array<string>;
   title: string;
-}
-
-/**
- * Concatenates a list of strings into a valid query for WikipediaAPI
- * @param items a list of strings that will be concatenated together
- */
-const createStringURL = (items: Array<string>) => {
-  let listOfItems = ""
-  items.forEach(anItem => {
-    listOfItems += anItem.replace(" ", "_") + "|"
-  });
-  return listOfItems.slice(0, -1);
+  originalTitle: string;
+  extract: string;
 }
 
 /**
@@ -27,24 +19,52 @@ const checkAmbiguity = (givenString: string) => {
   return givenString === 'Category:Disambiguation pages';
 }
 
-export default {
-  getCategories: (title: string): Promise<WikiItem> => {
+/**
+ * Removes the string 'Category:' from the given string
+ * @param category a string that represents a category
+ */
+const trimCategory = (category: string) => {
+  if (category.match('^\\b(Category:)+')) {
+    return category.slice(9);
+  }
+  return category;
+}
+
+export const WikipediaAPI = {
+  getItemInfo: (title: string): Promise<WikiItem> => {
     return new Promise((resolve, reject) => {
-      fetch(CATEGORY_ENDPOINT + title).then((data) => data.json()).then((data) => {
+      fetch(CATEGORY_ENDPOINT + title).then(data => data.json()).then((data) => {
         const pageKey = Object.keys(data.query.pages)[0];
         if (pageKey === '-1') {
-          reject('Not found');
+          reject(new Error('Not Found'));
           return;
         }
         const pageData = data.query.pages[pageKey];
         resolve({
           title: pageData.title,
-          categories: pageData.categories.map((item: any) => item.title),
+          originalTitle: title,
+          exists: true,
+          links: [],
+          extract: pageData.extract,
+          categories: pageData.categories.map((item: any) => trimCategory(item.title)),
           isAmbiguous: checkAmbiguity(pageData.categories[0].title)
         })
       }).catch((err) => {
         reject(err);
       });
+    });
+  },
+  getAmbiguousLinks: (title: string): Promise<Array<string>> => {
+    return new Promise((resolve, reject) => {
+      fetch(LINKS_ENDPOINT + title).then(data => data.json()).then((data) => {
+        const pageKey = Object.keys(data.query.pages)[0];
+        if (pageKey === '-1') {
+          reject(new Error('Not Found'));
+          return;
+        }
+        const pageData = data.query.pages[pageKey];
+        resolve(pageData.links.map((linkObj: any) => linkObj.title));
+      })
     });
   }
 }

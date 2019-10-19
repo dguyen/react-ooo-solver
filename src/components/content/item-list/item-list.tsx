@@ -1,14 +1,14 @@
 import React from 'react';
-import './input-list.scss';
+import './item-list.scss';
 
 interface Props {
   removeHandler: Function,
   selectItem: Function,
-  inputs: Array<string>,
+  items: Array<string>,
   selectedItem: string | null,
 }
 
-export default class InputList extends React.Component<Props> {
+export default class ItemList extends React.Component<Props> {
   /**
    * Remove an item from the list
    * @param {number} i - the index of the item
@@ -20,7 +20,7 @@ export default class InputList extends React.Component<Props> {
   }
 
   render() {
-    const itemList = this.props.inputs.map((anInput, i) => {
+    const itemList = this.props.items.map((anInput, i) => {
       return (
         <div
           id="item"

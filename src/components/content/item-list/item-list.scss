@@ -17,6 +17,7 @@
     flex-direction: row;
     align-items: center;
     margin-bottom: 12px;
+    color: black;
 
     #indicator {
       width: 7px;
@@ -54,10 +55,22 @@
 }
 
 .selectedItem {
-  color: rgb(38, 126, 197);
+  color: rgb(38, 126, 197) !important;
   background-color: rgba(51, 160, 250, 0.11);
 
   #deleteIcon {
     opacity: 1 !important;
   }
+}
+
+.redIndicator {
+  background-color: rgb(221, 43, 43) !important;
+}
+
+.orangeIndicator {
+  background-color: rgb(240, 206, 19)  !important;
+}
+
+.greenIndicator {
+  background-color: rgb(14, 223, 8) !important;
 }

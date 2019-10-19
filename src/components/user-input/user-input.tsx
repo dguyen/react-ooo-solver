@@ -10,9 +10,9 @@ class UserInput extends React.Component<Props> {
   /**
    * Adds a new input
    */
-  addNewInput() {
+  addNewInput = () => {
     let newInputRef = (document.getElementById('userInputField') as HTMLInputElement);
-    
+  
     if (newInputRef && this.validateInput(newInputRef.value)) {
       this.props.addInput(newInputRef.value);
       newInputRef.value = '';

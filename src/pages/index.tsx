@@ -1,5 +1,5 @@
 import React from 'react';
-import WikipediaAPI, { WikiItem } from '../api/WikipediaAPI';
+import { WikipediaAPI, WikiItem } from '../api/WikipediaAPI';
 
 // Components
 import Header from '../components/header/header';
@@ -44,18 +44,20 @@ export default class App extends React.Component<undefined, MyState> {
    * @param itemName the name of the item to set categories
    */
   setItemCategories = (itemName: string) => {
-    WikipediaAPI.getCategories(itemName).then((data) => {
-      if (data.isAmbiguous) {
-        // Todo: Get potiential links
-      }
+    WikipediaAPI.getItemInfo(itemName).then((data: WikiItem) => {
       this.setState((prev) => {
         let newWikiItems = Object.assign(prev.wikiItems);
         newWikiItems[itemName] = data;
         return { wikiItems: newWikiItems }
       })
-    }).catch((err) => {
-      // Todo: Handle missing page error
-      console.log(err);
+      if (data.isAmbiguous) {
+        WikipediaAPI.getAmbiguousLinks(itemName).then((links: string[]) => {
+          this.setState((prev) => {
+            let update = Object.assign(prev.wikiItems);
+            update[itemName].links = links;
+          });
+        })
+      }
     })
   }
 
@@ -99,10 +101,11 @@ export default class App extends React.Component<undefined, MyState> {
     if (this.state.userInputs.length > 0) {
       showContent = (
         <Content 
-          inputs={this.state.userInputs}
+          items={this.state.userInputs}
+          wikiItems={this.state.wikiItems}
           selectedItem={this.state.selectedItem}
           selectItem={this.selectItem}
-          removeHandler={this.removeItem}/>
+          removeHandler={this.removeItem} />
       );
     }
 
