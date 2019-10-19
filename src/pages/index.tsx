@@ -22,13 +22,18 @@ export default class App extends React.Component<undefined, MyState> {
   /**
    * Add an item to user inputs
    * @param {string} itemName - the name of the item to be added  
+   * @param {number} index (optional) - the index to insert the item, default (-1) is end of list 
    */
-  addItem = (itemName: string) => {
+  addItem = (itemName: string, index: number = -1) => {
     if (this.state.userInputs.includes(itemName)) { return }
     this.setState((prev) => {
-      let newUpdate = {
-        userInputs: prev.userInputs.concat([itemName]),
-        selectedItem: prev.userInputs.length <= 0 ? itemName : prev.selectedItem
+      const newUpdate: MyState = Object.assign(prev);
+      if (index < 0) {
+        newUpdate.userInputs.push(itemName),
+        newUpdate.selectedItem = newUpdate.userInputs.length <= 0 ? itemName : newUpdate.selectedItem
+      } else {
+        newUpdate.userInputs.splice(index, 0, itemName);
+        newUpdate.selectedItem = itemName;
       }
       return newUpdate;
     });
@@ -59,6 +64,21 @@ export default class App extends React.Component<undefined, MyState> {
         })
       }
     })
+  }
+
+  /**
+   * Replaces the given item with a new item
+   * @param item item to be addded
+   * @param oldItem item to be replaced
+   */
+  replaceItem = (newItem: string, oldItem: string) => {
+    const oldIndex = this.state.userInputs.indexOf(oldItem);
+    if (oldIndex >= 0) {
+      this.removeItem(oldIndex);
+    }
+    if (!this.state.userInputs.includes(newItem)) {
+      this.addItem(newItem, oldIndex);
+    }
   }
 
   /**
@@ -105,6 +125,7 @@ export default class App extends React.Component<undefined, MyState> {
           wikiItems={this.state.wikiItems}
           selectedItem={this.state.selectedItem}
           selectItem={this.selectItem}
+          replaceItemHandler={this.replaceItem}
           removeHandler={this.removeItem} />
       );
     }

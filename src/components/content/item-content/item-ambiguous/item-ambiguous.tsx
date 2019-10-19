@@ -4,11 +4,12 @@ import { WikiItem } from '../../../../api/WikipediaAPI';
 
 interface Props {
   itemInfo: WikiItem,
+  replaceItem: Function
 }
 
 const ItemAmbiguous = (props: Props) => {
-  const links = props.itemInfo.categories.map((link) => {
-    return <li key={link + 'amb'}>{link}</li>
+  const links = props.itemInfo.links.map((link) => {
+    return <li key={link + 'amb'} onClick={() => props.replaceItem(link)}>{link}</li>
   });
 
   return (

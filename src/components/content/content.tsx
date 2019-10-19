@@ -12,20 +12,27 @@ interface Props {
   items: Array<string>,
   removeHandler: Function,
   selectItem: Function,
+  replaceItemHandler: Function,
   selectedItem: string | null,
   wikiItems: { [id: string]: WikiItem; };
 }
 
 export default class Content extends React.Component<Props> {
+  /**
+   * Returns the type of content to be shown
+   */
   getContent() {
     if (!this.props.selectedItem) {
       return 'Loading';
     }
     const item = this.props.wikiItems[this.props.selectedItem];
+    const replaceHandler = (newItem: string) => {
+      this.props.replaceItemHandler(newItem, item.originalTitle)
+    }
     if (!item) {
       return 'Loading';
     } else if (item.isAmbiguous) {
-      return <ItemAmbiguous itemInfo={item} />
+      return <ItemAmbiguous itemInfo={item} replaceItem={replaceHandler} />
     } else if (item.exists) {
       return <ItemInfo itemInfo={item} />
     } else {
