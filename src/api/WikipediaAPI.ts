@@ -35,19 +35,16 @@ export const WikipediaAPI = {
     return new Promise((resolve, reject) => {
       fetch(CATEGORY_ENDPOINT + title).then(data => data.json()).then((data) => {
         const pageKey = Object.keys(data.query.pages)[0];
-        if (pageKey === '-1') {
-          reject(new Error('Not Found'));
-          return;
-        }
+        const exists = pageKey !== '-1';
         const pageData = data.query.pages[pageKey];
         resolve({
-          title: pageData.title,
+          title: exists ? pageData.title : '',
           originalTitle: title,
-          exists: true,
+          exists: exists,
           links: [],
-          extract: pageData.extract,
-          categories: pageData.categories.map((item: any) => trimCategory(item.title)),
-          isAmbiguous: checkAmbiguity(pageData.categories[0].title)
+          extract: exists ? pageData.extract : '',
+          categories: exists ? pageData.categories.map((item: any) => trimCategory(item.title)) : [],
+          isAmbiguous: exists ? checkAmbiguity(pageData.categories[0].title) : false
         })
       }).catch((err) => {
         reject(err);

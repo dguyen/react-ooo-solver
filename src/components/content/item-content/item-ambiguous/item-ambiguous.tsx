@@ -8,7 +8,7 @@ interface Props {
 
 const ItemAmbiguous = (props: Props) => {
   const links = props.itemInfo.categories.map((link) => {
-    return <li>{link}</li>
+    return <li key={link + 'amb'}>{link}</li>
   });
 
   return (

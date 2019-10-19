@@ -4,8 +4,20 @@ import './item-list.scss';
 interface Props {
   removeHandler: Function,
   selectItem: Function,
-  items: Array<string>,
+  items: Array<ListItem>,
   selectedItem: string | null,
+}
+
+export interface ListItem {
+  name: string;
+  status: string;
+}
+
+export enum ItemStatus {
+  error = 'redIndicator',
+  pause = 'orangeIndicator',
+  okay = 'greenIndicator',
+  loading = 'loadingIndicator',
 }
 
 export default class ItemList extends React.Component<Props> {
@@ -20,16 +32,16 @@ export default class ItemList extends React.Component<Props> {
   }
 
   render() {
-    const itemList = this.props.items.map((anInput, i) => {
+    const itemList = this.props.items.map((item, i) => {
       return (
         <div
           id="item"
-          onClick={() => this.props.selectItem(anInput)}
-          className={this.props.selectedItem === anInput ? 'selectedItem' : undefined}
+          onClick={() => this.props.selectItem(item.name)}
+          className={this.props.selectedItem === item.name ? 'selectedItem' : undefined}
           key={i}
         >
-          <div id="indicator"></div>
-          <span>{anInput}</span>
+          <div id="indicator" className={item.status}></div>
+          <span>{item.name}</span>
           <svg
             id="deleteIcon"
             onClick={(e) => this.removeItem(i, e)}

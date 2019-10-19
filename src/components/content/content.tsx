@@ -3,7 +3,7 @@ import { WikiItem } from '../../api/WikipediaAPI';
 import './content.scss';
 
 // Components
-import ItemList from './item-list/item-list';
+import ItemList, { ListItem, ItemStatus } from './item-list/item-list';
 import Item404 from './item-content/item-404/item-404';
 import ItemAmbiguous from './item-content/item-ambiguous/item-ambiguous';
 import ItemInfo from './item-content/item-info/item-info';
@@ -33,13 +33,44 @@ export default class Content extends React.Component<Props> {
     }
   }
 
+  /**
+   * Returns a string representing the status of the item
+   * @param itemInfo the wiki item to get the status from
+   */
+  getStatus(itemInfo: WikiItem | null): string {
+    if (itemInfo) {
+      if (!itemInfo.exists) {
+        return ItemStatus.error;
+      } else if (itemInfo.isAmbiguous) {
+        return ItemStatus.pause;
+      } else {
+        return ItemStatus.okay;
+      }
+    } else {
+      return ItemStatus.loading;
+    }
+  }
+
+  /**
+   * Returns a list of active items and their status
+   */
+  getActiveItems(): ListItem[] {
+    return this.props.items.map((title: string) => {
+      const tmp = this.props.wikiItems[title]
+      return {
+        name: tmp ? tmp.originalTitle : title,
+        status: this.getStatus(tmp),
+      }
+    });
+  }
+
   render() {
     return (
       <div id="contentContainer">
         <div id="contentCard">
           <div id="inputListContainer">
             <ItemList
-              items={this.props.items}
+              items={this.getActiveItems()}
               removeHandler={this.props.removeHandler}
               selectedItem={this.props.selectedItem}
               selectItem={this.props.selectItem}

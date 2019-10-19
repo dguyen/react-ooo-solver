@@ -8,7 +8,7 @@ interface Props {
 
 const ItemInfo = (props: Props) => {
   const categories = props.itemInfo.categories.map((category) => {
-    return <li key={category}>{category}</li>
+    return <li key={category + 'itemInfo'}>{category}</li>
   });
 
   return (
