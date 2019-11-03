@@ -1,5 +1,5 @@
 import React from 'react';
-import { WikipediaAPI, WikiItem } from '../api/WikipediaAPI';
+import { Wikipedia, WikiItem } from '../api/WikipediaAPI';
 
 // Components
 import Header from '../components/header/header';
@@ -13,6 +13,8 @@ interface MyState {
 }
 
 export default class App extends React.Component<undefined, MyState> {
+  WikipediaAPI: Wikipedia = new Wikipedia();
+
   state = {
     userInputs: [] as Array<string>,
     selectedItem: null,
@@ -26,15 +28,15 @@ export default class App extends React.Component<undefined, MyState> {
    */
   addItem = (itemName: string, index: number = -1) => {
     if (this.state.userInputs.includes(itemName)) { return }
+
     this.setState((prev) => {
       const newUpdate: MyState = Object.assign(prev);
       if (index < 0) {
-        newUpdate.userInputs.push(itemName),
-        newUpdate.selectedItem = newUpdate.userInputs.length <= 0 ? itemName : newUpdate.selectedItem
+        newUpdate.userInputs.push(itemName);
       } else {
         newUpdate.userInputs.splice(index, 0, itemName);
-        newUpdate.selectedItem = itemName;
       }
+      newUpdate.selectedItem = itemName;
       return newUpdate;
     });
 
@@ -49,19 +51,22 @@ export default class App extends React.Component<undefined, MyState> {
    * @param itemName the name of the item to set categories
    */
   setItemCategories = (itemName: string) => {
-    WikipediaAPI.getItemInfo(itemName).then((data: WikiItem) => {
-      this.setState((prev) => {
-        let newWikiItems = Object.assign(prev.wikiItems);
-        newWikiItems[itemName] = data;
-        return { wikiItems: newWikiItems }
-      })
+    this.WikipediaAPI.getInfo(itemName).then((data: WikiItem) => {
       if (data.isAmbiguous) {
-        WikipediaAPI.getAmbiguousLinks(itemName).then((links: string[]) => {
+        this.WikipediaAPI.getAmbiguousLinks(itemName).then((links: string[]) => {
           this.setState((prev) => {
             let update = Object.assign(prev.wikiItems);
+            update[itemName] = data;
             update[itemName].links = links;
+            return { wikiItems: update };
           });
-        })
+        });
+      } else {
+        this.setState((prev) => {
+          let newWikiItems = Object.assign(prev.wikiItems);
+          newWikiItems[itemName] = data;
+          return { wikiItems: newWikiItems }
+        });  
       }
     })
   }
@@ -113,7 +118,7 @@ export default class App extends React.Component<undefined, MyState> {
   }
 
   solve = () => {
-    console.log('Todo: Solve inputs' + this.state.userInputs.toString());
+    // Todo: Solve
   }
 
   render() {
