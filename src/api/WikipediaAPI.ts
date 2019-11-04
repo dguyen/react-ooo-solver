@@ -108,8 +108,12 @@ export class Wikipedia {
             if (!Number.isNaN(parsedId) && parsedId > 0) {
               // Checks if data has already been stored
               if (!this.storedItems.hasOwnProperty(page.title)) {
-                this.storedItems[page.title] = page.categories.map((x: any) => x.title);
-                output.push(...page.categories.map((x: any) => x.title));
+                if (page.categories) {
+                  this.storedItems[page.title] = page.categories.map((x: any) => x.title);
+                  output.push(...page.categories.map((x: any) => x.title));
+                } else {
+                  output.push(page.title);
+                }
               }
             }
           }
