@@ -9,4 +9,16 @@
   #categoryList > p {
     font-weight: bold;
   }
+
+  .expandSpan {
+    color: rgb(71, 144, 179);
+  }
+
+  .expandSpan:active {
+    color: rgb(23, 66, 87);
+  }
+
+  .expandSpan:hover {
+    color: rgb(56, 119, 148);
+  }
 }  

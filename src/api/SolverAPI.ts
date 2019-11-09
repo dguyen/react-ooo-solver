@@ -8,32 +8,55 @@ interface Relation {
 
 interface Intersection {
   intersect: Array<WikiItem>;
-  exclusion: string;
+  exclusion: WikiItem;
+}
+/**
+ * Interface describing the odd item out
+ *   oddItem - the odd item out
+ *   overlaps - the categories that excluded it
+ *   groupedItems - the other items
+ */
+export interface OddOneOut {
+  oddItem: WikiItem;
+  overlaps: string[];
+  groupedItems: WikiItem[];
 }
 
 export class SolverAPI {
 
-  oddOneOut(items: Array<WikiItem>): void {
-    this.verifyItems(items);
+  oddOneOut(items: Array<WikiItem>): OddOneOut | null {
+    const error =  this.verifyItems(items);
+    if (error) {
+      throw error;
+    }
     const relations: Array<Relation> = [];
     const intersections = this.getIntersections(items);
 
-    let currMax = 0;
-    // let maxIndex = 0;
-    let currMaxStuff = null;
+    let currMaxIndex = 0;
+    let currMaxValue = null;
 
     for (let i = 0; i < intersections.length; i++) {
-      const tmp = this.getAllCategories(intersections[i].intersect);
-      if (tmp.overlapCategories.length > 0 && tmp.overlapCategories.length > currMax) {
-        currMax = tmp.overlapCategories.length;
-        currMaxStuff = intersections[i];
+      const tmp = this.getAllCategories(intersections[i]);
+      
+      if (tmp.overlapCategories.length > 0 && tmp.overlapCategories.length > currMaxIndex) {
+        currMaxIndex = tmp.overlapCategories.length;
+        currMaxValue = {
+          intersections: intersections[i],
+          categories: tmp,
+        }
       }
       relations.push(tmp);
-      console.log(relations);
     }
-
-    console.log(currMax);
-    console.log(currMaxStuff);
+    
+    if (!currMaxValue) {
+      return null;
+    }
+  
+    return {
+      oddItem: currMaxValue.intersections.exclusion,
+      overlaps: currMaxValue.categories.overlapCategories,
+      groupedItems: currMaxValue.intersections.intersect,
+    }
   }
 
   private getIntersections(items: Array<WikiItem>): Array<Intersection> {
@@ -41,21 +64,21 @@ export class SolverAPI {
     for (let i = 0; i < items.length; i++) {
       let itemsCopy = items.slice();
       itemsCopy.splice(i, 1);
-
+      
       output.push({
-        exclusion: items[i].title,
+        exclusion: items[i],
         intersect: itemsCopy,
       });
     }
     return output;
   }
 
-  private getAllCategories(items: Array<WikiItem>): Relation {
-    let arrayOfItems = items.slice();
+  private getAllCategories(intersections: Intersection): Relation {
+    let arrayOfItems = intersections.intersect.slice();
     let tmpHolder: Relation = {
-      overlapTitles: [items[0].title],
-      excludedTitle: '',
-      overlapCategories: items[0].categories
+      overlapTitles: [arrayOfItems[0].title],
+      excludedTitle: intersections.exclusion.title,
+      overlapCategories: arrayOfItems[0].categories
     }
 
     for (let i = 1; i < arrayOfItems.length; i++) {
@@ -65,15 +88,20 @@ export class SolverAPI {
     return tmpHolder;
   }
 
-  verifyItems(items: Array<WikiItem>): void {
+  /**
+   * Verify the given items. Returns error if items invalid otherwise returns null
+   * @param items - WikiItems to verify
+   */
+  verifyItems(items: Array<WikiItem>): Error | null {
     if (items.length <= 2) {
-      throw new Error('Invalid parameter length');
+      return Error('Invalid parameter length');
     }
-    items.forEach(item => {
-      if (!item.exists || item.isAmbiguous) {
-        throw new Error('Items not ready');
+    for (let i = 0; i < items.length; i++) {
+      if (items[i] === undefined || !items[i].exists || items[i].isAmbiguous) {        
+        return Error('Items not ready');
       }
-    });
+    }
+    return null;
   }
 
 }
